@@ -15,8 +15,9 @@ TIMESTAMP=$(date +%Y%m%d)
 VERSION='1.0.1'
 
 # External objects
-export OBJECTS
-MMT_OBJECTS=("magisk/META-INF/com/google/android/update-binary" "magisk/setup.sh" "magisk/common/functions.sh" "magisk/uninstall.sh")
+# change content up on your adational files
+# OBJECTS=$("file1" "file2")
+MMT_OBJECTS=("META-INF/com/google/android/update-binary" "setup.sh" "common/functions.sh" "uninstall.sh")
 FILENAME="openMMT-$VERSION-$RANDOM-$TIMESTAMP"
 
 if [[ -z "$object_directory" ]]; then
@@ -33,8 +34,8 @@ compile()
 {
 	[[ -d "$OUT/target" ]] || mkdir "$OUT/target"
 	[[ -d "$OUT/product" ]] || mkdir "$OUT/product"
-	cp -afr "magisk/." "$OUT/product"
-	cp -af "${OBJECTS[@]}" "$OUT/product"
+	cp -afr "." "$OUT/product"
+	[[ $OBJECTS ]] && cp -af "${OBJECTS[@]}" "$OUT/product"
 	cd "$OUT/product" || exit
 	zip -0 -r9 -ll "$OUT/target/$FILENAME.zip" . -x "$FILENAME" >/dev/null
 	echo " ZIP  $OUT/target/$FILENAME.zip"
@@ -58,9 +59,9 @@ do
 	case "${opts}" in
 		"--shellcheck")
 			shellcheck "${MMT_OBJECTS[@]}"
-			shellcheck "${OBJECTS[@]}"
+			[[ $OBJECTS ]] && shellcheck "${OBJECTS[@]}"
 			echo " SHCHK  ${MMT_OBJECTS[@]}"
-			echo " SHCHK  ${OBJECTS[@]}"
+			[[ $OBJECTS ]] && echo " SHCHK  ${OBJECTS[@]}"
 			[[ $? == "0" ]] && compile || echo "failed"
 		;;
 		"--compile")
